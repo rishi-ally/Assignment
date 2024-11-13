@@ -1,28 +1,33 @@
-
-import React, { useState } from 'react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import ZoomedOutView from './ZoomedOutView';
+import React, { useState } from "react";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import ZoomedOutView from "./ZoomedOutView";
 
 function MainViewer() {
   const [zoomPosition, setZoomPosition] = useState({ x: 0.5, y: 0.5 });
 
-  const handleZoomChange = ({ state }) => {
-    const { positionX, positionY, scale } = state;
+  const handleZoomChange = ({ positionX, positionY, scale }) => {
+    const imageWidth = 2000; // Replace with your image's actual width
+    const imageHeight = 1500; // Replace with your image's actual height
 
-    const imageWidth = 2000; 
-    const imageHeight = 1500; 
-
-    
+    // Calculate visible viewport dimensions
     const viewportWidth = imageWidth / scale;
     const viewportHeight = imageHeight / scale;
 
-    const viewCenterX = (positionX + viewportWidth / 2) / imageWidth;
-    const viewCenterY = (positionY + viewportHeight / 2) / imageHeight;
+    // Calculate the top-left corner of the viewport (adjust for negative offsets)
+    const adjustedX = Math.max(0, Math.min(imageWidth, Math.abs(positionX)));
+    const adjustedY = Math.max(0, Math.min(imageHeight, Math.abs(positionY)));
 
+    // Calculate center of the viewport in image coordinates
+    const centerX = adjustedX + viewportWidth / 2;
+    const centerY = adjustedY + viewportHeight / 2;
+
+    // Normalize to a range of 0-1 for zoomed-out view
+    const normalizedX = centerX / imageWidth;
+    const normalizedY = centerY / imageHeight;
 
     setZoomPosition({
-      x: Math.max(0, Math.min(1, viewCenterX)),
-      y: Math.max(0, Math.min(1, viewCenterY)),
+      x: Math.max(0, Math.min(1, normalizedX)),
+      y: Math.max(0, Math.min(1, normalizedY)),
     });
   };
 
@@ -30,12 +35,28 @@ function MainViewer() {
     <div className="main-viewer">
       <h4>WSI Zoomed IN View</h4>
       <TransformWrapper
-        onZoomChange={handleZoomChange}
-        onPanning={handleZoomChange}
+        onZoomChange={({ state }) =>
+          handleZoomChange({
+            positionX: state.positionX,
+            positionY: state.positionY,
+            scale: state.scale,
+          })
+        }
+        onPanning={({ state }) =>
+          handleZoomChange({
+            positionX: state.positionX,
+            positionY: state.positionY,
+            scale: state.scale,
+          })
+        }
         centerOnInit
       >
         <TransformComponent>
-          <img src="/wsi.png" alt="Whole Slide Image" style={{ width: '100%', height: 'auto' }} />
+          <img
+            src="/Assignment/wsi.png"
+            alt="Whole Slide Image"
+            style={{ width: "100%", height: "auto" }}
+          />
         </TransformComponent>
       </TransformWrapper>
       <ZoomedOutView zoomPosition={zoomPosition} />
