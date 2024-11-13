@@ -6,22 +6,19 @@ function MainViewer() {
   const [zoomPosition, setZoomPosition] = useState({ x: 0.5, y: 0.5 });
 
   const handleZoomChange = ({ positionX, positionY, scale }) => {
-    const imageWidth = 2000; // Replace with your image's actual width
-    const imageHeight = 1500; // Replace with your image's actual height
+    const imageWidth = 2000; 
+    const imageHeight = 1500;
 
-    // Calculate visible viewport dimensions
     const viewportWidth = imageWidth / scale;
     const viewportHeight = imageHeight / scale;
 
-    // Calculate the top-left corner of the viewport (adjust for negative offsets)
     const adjustedX = Math.max(0, Math.min(imageWidth, Math.abs(positionX)));
     const adjustedY = Math.max(0, Math.min(imageHeight, Math.abs(positionY)));
 
-    // Calculate center of the viewport in image coordinates
+    
     const centerX = adjustedX + viewportWidth / 2;
     const centerY = adjustedY + viewportHeight / 2;
 
-    // Normalize to a range of 0-1 for zoomed-out view
     const normalizedX = centerX / imageWidth;
     const normalizedY = centerY / imageHeight;
 
